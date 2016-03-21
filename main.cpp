@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <memory>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -16,6 +17,12 @@ template<typename T>
 void show_vec(const vector<T>& v) {
   for_each(begin(v), end(v), show_elem<T>);
   cout << endl;
+}
+
+template<typename T>
+ostream& operator<<(ostream& out, const vector<T>& v) {
+  for (auto e : v) { out << e << " "; }
+  return out;
 }
 
 void for_each_example() {
@@ -211,6 +218,41 @@ void unique_example() {
   show_vec(k);
 }
 
+void lower_upper_bound_example() {
+  vector<int> v{1, 2, 3, 4, 60, 70, 90, 102};
+  int b = 5;
+  vector<int>::iterator lb = lower_bound(v.begin(), v.end(), b);
+  cout << "Lower bound of" << endl;
+  show_vec(v);
+  cout << "by " << b << " is " << *lb << endl;
+  cout << "Upper bound of" << endl;
+  show_vec(v);
+  b = 60;
+  auto ub = upper_bound(v.begin(), v.end(), b);
+  cout << "by " << b << " is " << *ub << endl;
+}
+
+void uninitialized_copy_example() {
+  vector<int> v{1, 2, 3, 4, 5, 6, 7};
+  vector<int> cpy(v.size());
+  uninitialized_copy(v.begin(), v.end(), cpy.begin());
+  show_vec(v);
+  show_vec(cpy);
+  cout << cpy << endl;
+}
+
+void uninitialized_fill_example() {
+  string* p;
+  size_t sz;
+  tie(p, sz) = get_temporary_buffer<string>(4);
+  uninitialized_fill(p, p + sz, "Example");
+  for (string* i = p; i != p + sz; ++i) {
+    cout << *i << endl;
+    i->~basic_string<char>();
+  }
+  return_temporary_buffer(p);
+}
+
 int main() {
   for_each_example();
   all_of_example();
@@ -227,5 +269,8 @@ int main() {
   find_if_example();
   heap_example();
   unique_example();
+  lower_upper_bound_example();
+  uninitialized_copy_example();
+  uninitialized_fill_example();
   return 0;
 }
